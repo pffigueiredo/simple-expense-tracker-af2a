@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ThemeProvider } from '@/components/theme-provider';
+import { ModeToggle } from '@/components/mode-toggle';
 import { trpc } from '@/utils/trpc';
 import { useState, useEffect, useCallback } from 'react';
 import { Trash2, Edit, Plus, Filter, DollarSign, Calendar, Tag } from 'lucide-react';
@@ -20,7 +21,7 @@ import type {
   UpdateCategoryInput 
 } from '../../server/src/schema';
 
-function App() {
+function AppContent() {
   // State management
   const [expenses, setExpenses] = useState<ExpenseWithCategory[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -184,17 +185,22 @@ function App() {
     }).format(amount);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2 flex items-center justify-center gap-3">
+        <div className="text-center mb-8 relative">
+          {/* Dark mode toggle positioned at top right */}
+          <div className="absolute top-0 right-0">
+            <ModeToggle />
+          </div>
+          
+          <h1 className="text-4xl font-bold text-foreground mb-2 flex items-center justify-center gap-3">
             💰 Expense Tracker
           </h1>
-          <p className="text-gray-600">Track your expenses and manage your budget efficiently</p>
+          <p className="text-muted-foreground">Track your expenses and manage your budget efficiently</p>
           
           {/* Note about stub implementation */}
-          <div className="mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded-lg text-sm text-yellow-800">
+          <div className="mt-4 p-3 bg-muted border border-border rounded-lg text-sm text-muted-foreground">
             <strong>Note:</strong> This application uses stub backend implementations. 
             Data won't persist and some features may not work as expected until the backend handlers are fully implemented.
           </div>
@@ -202,38 +208,38 @@ function App() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-green-400 to-green-600 text-white">
+          <Card className="border-green-200 dark:border-green-800 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-100">Total Expenses</p>
-                  <p className="text-2xl font-bold">{formatCurrency(totalExpenses)}</p>
+                  <p className="text-green-700 dark:text-green-300">Total Expenses</p>
+                  <p className="text-2xl font-bold text-green-800 dark:text-green-200">{formatCurrency(totalExpenses)}</p>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-200" />
+                <DollarSign className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-blue-400 to-blue-600 text-white">
+          <Card className="border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100">Total Transactions</p>
-                  <p className="text-2xl font-bold">{expenses.length}</p>
+                  <p className="text-blue-700 dark:text-blue-300">Total Transactions</p>
+                  <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">{expenses.length}</p>
                 </div>
-                <Calendar className="h-8 w-8 text-blue-200" />
+                <Calendar className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-purple-400 to-purple-600 text-white">
+          <Card className="border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100">Categories</p>
-                  <p className="text-2xl font-bold">{categories.length}</p>
+                  <p className="text-purple-700 dark:text-purple-300">Categories</p>
+                  <p className="text-2xl font-bold text-purple-800 dark:text-purple-200">{categories.length}</p>
                 </div>
-                <Tag className="h-8 w-8 text-purple-200" />
+                <Tag className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               </div>
             </CardContent>
           </Card>
@@ -411,8 +417,8 @@ function App() {
               </CardHeader>
               <CardContent>
                 {expenses.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <DollarSign className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <div className="text-center py-8 text-muted-foreground">
+                    <DollarSign className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                     <p>No expenses recorded yet. Add your first expense above! 🚀</p>
                   </div>
                 ) : (
@@ -420,14 +426,14 @@ function App() {
                     {expenses.map((expense: ExpenseWithCategory) => (
                       <div
                         key={expense.id}
-                        className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow"
+                        className="flex items-center justify-between p-4 border border-border rounded-lg bg-card shadow-sm hover:shadow-md transition-shadow"
                       >
                         <div className="flex-grow">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold text-lg">{expense.description}</h3>
+                            <h3 className="font-semibold text-lg text-card-foreground">{expense.description}</h3>
                             <Badge variant="secondary">{expense.category.name}</Badge>
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-muted-foreground">
                             <span className="mr-4">📅 {expense.date.toLocaleDateString()}</span>
                             <span>💰 {formatCurrency(expense.amount)}</span>
                           </div>
@@ -523,8 +529,8 @@ function App() {
               </CardHeader>
               <CardContent>
                 {categories.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <Tag className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Tag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                     <p>No categories yet. Create your first category! 🏷️</p>
                   </div>
                 ) : (
@@ -532,11 +538,11 @@ function App() {
                     {categories.map((category: Category) => (
                       <div
                         key={category.id}
-                        className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm"
+                        className="flex items-center justify-between p-4 border border-border rounded-lg bg-card shadow-sm"
                       >
                         <div>
-                          <h3 className="font-semibold">{category.name}</h3>
-                          <p className="text-sm text-gray-500">
+                          <h3 className="font-semibold text-card-foreground">{category.name}</h3>
+                          <p className="text-sm text-muted-foreground">
                             Created: {category.created_at.toLocaleDateString()}
                           </p>
                         </div>
@@ -584,6 +590,14 @@ function App() {
         </Tabs>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider defaultTheme="light" storageKey="expense-tracker-theme">
+      <AppContent />
+    </ThemeProvider>
   );
 }
 
