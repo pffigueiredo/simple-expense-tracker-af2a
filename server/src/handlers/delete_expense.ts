@@ -1,7 +1,26 @@
 
+import { db } from '../db';
+import { expensesTable } from '../db/schema';
+import { eq } from 'drizzle-orm';
+
 export const deleteExpense = async (id: number): Promise<void> => {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is deleting an expense from the database.
-    // Should validate that expense exists before attempting deletion.
-    return Promise.resolve();
+  try {
+    // First check if expense exists
+    const existingExpense = await db.select()
+      .from(expensesTable)
+      .where(eq(expensesTable.id, id))
+      .execute();
+
+    if (existingExpense.length === 0) {
+      throw new Error(`Expense with id ${id} not found`);
+    }
+
+    // Delete the expense
+    await db.delete(expensesTable)
+      .where(eq(expensesTable.id, id))
+      .execute();
+  } catch (error) {
+    console.error('Expense deletion failed:', error);
+    throw error;
+  }
 };
